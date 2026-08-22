@@ -8,8 +8,8 @@ A lightweight and minimalist desktop Markdown reader.
 
 Unlike Electron-based readers, Lekto is built with Tauri v2 (Rust backend paired with a lightweight web frontend, with no Node.js runtime), delivering minimal resource consumption and a compact footprint:
 
-- **Release binary:** 14.5 MiB
-- **.deb package:** 5.6 MB
+- **Release binary:** 15.9 MiB
+- **.deb package:** 5.5 MB
 - **Reading and rendering a ~50 KB `.md` in Rust:** under 1 ms
 
 ## Features
@@ -28,7 +28,7 @@ Unlike Electron-based readers, Lekto is built with Tauri v2 (Rust backend paired
 
 ## Requirements
 
-Lekto uses the web engine already provided by the operating system instead of bundling its own. That is why the binary is 14.5 MiB, and also why that engine needs to be present on the system.
+Lekto uses the web engine already provided by the operating system instead of bundling its own. That is why the binary is 15.9 MiB, and also why that engine needs to be present on the system.
 
 | System | Requires | Included by default? |
 |---|---|---|
@@ -54,7 +54,7 @@ On Fedora or openSUSE, with the `.rpm`:
 sudo dnf install ./Lekto-0.1.0-1.x86_64.rpm
 ```
 
-There is also an `.AppImage` that requires no installation: make it executable with `chmod +x` and run it. It is considerably larger (85 MB) because it carries its own libraries. If your system has no FUSE, run it with `./Lekto_0.1.0_amd64.AppImage --appimage-extract-and-run`.
+There is also an `.AppImage` that requires no installation: make it executable with `chmod +x` and run it. It is considerably larger (83 MB) because it carries its own libraries. If your system has no FUSE, run it with `./Lekto_0.1.0_amd64.AppImage --appimage-extract-and-run`.
 
 ### Windows
 
