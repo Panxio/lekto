@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lekto</title>
+    <style>
+      :root {
+        /* Declara el esquema al motor web para que pinte los controles nativos
+           (barras de scroll, campos) con la paleta correcta. Sin esto, WebView2
+           usa el esquema del sistema y en tema oscuro el riel sale BLANCO. */
+        color-scheme: light;
+        --bg-color: #ffffff;
+        --chrome-bg: #f6f8fa;
+        --text-color: #24292f;
+        
+        --input-bg: #ffffff;
+        --input-color: #24292f;
+        --input-border: #d0d7de;
+        --input-focus-border: #0969da;
+        --input-focus-shadow: rgba(9, 105, 218, 0.15);
+        
+        --btn-open-bg: #2da44e;
+        --btn-open-hover-bg: #2c974b;
+        --btn-open-color: #ffffff;
+        
+        --btn-select-bg: #0969da;
+        --btn-select-hover-bg: #074fa8;
+        --btn-select-color: #ffffff;
+        
+        --btn-toggle-bg: #f6f8fa;
+        --btn-toggle-color: #24292f;
+        --btn-toggle-border: #d0d7de;
+        --btn-toggle-hover-bg: #e6ebf1;
+        
+        --btn-border: rgba(27, 31, 36, 0.15);
+        
+        --error-color: #cf222e;
+        
+        --border-color: #d0d7de;
+        --code-bg: rgba(175, 184, 193, 0.2);
+        --pre-bg: #f6f8fa;
+        --link-color: #0969da;
+      }
+
+      [data-theme="dark"] {
+        color-scheme: dark;
+        --bg-color: #0d1117;
+        --chrome-bg: #161b22;
+        --text-color: #c9d1d9;
+        
+        --input-bg: #0d1117;
+        --input-color: #c9d1d9;
+        --input-border: #30363d;
+        --input-focus-border: #58a6ff;
+        --input-focus-shadow: rgba(56, 139, 253, 0.3);
+        
+        --btn-open-bg: #238636;
+        --btn-open-hover-bg: #2ea043;
+        --btn-open-color: #ffffff;
+        
+        --btn-select-bg: #1f6feb;
+        --btn-select-hover-bg: #388bfd;
+        --btn-select-color: #ffffff;
+        
+        --btn-toggle-bg: #21262d;
+        --btn-toggle-color: #c9d1d9;
+        --btn-toggle-border: #30363d;
+        --btn-toggle-hover-bg: #30363d;
+        
+        --btn-border: rgba(240, 246, 252, 0.1);
+        
+        --error-color: #f85149;
+        
+        --border-color: #30363d;
+        --code-bg: rgba(110, 118, 129, 0.4);
+        --pre-bg: #161b22;
+        --link-color: #58a6ff;
+      }
+
+      /* Barras de scroll finas, lo mas parejas posible entre Linux y Windows.
+         Es la propiedad estandar (no ::-webkit-scrollbar), asi que no hay que
+         redefinir colores ni pintar el thumb a mano; el sistema sigue mandando en
+         los colores. OJO: en Windows 'thin' NO quita los botones ▲▼ — el estilo
+         Fluent de WebView2 los conserva aun en modo fino (verificado en captura
+         de Windows 11: riel de 10 px CON flechas).
+         Va en '*' porque scrollbar-width NO se hereda: puesta solo en html
+         afectaria unicamente al scroller raiz, y aca los que scrollean son los
+         paneles, el sidebar y los bloques de codigo. */
+      * { scrollbar-width: thin; }
+
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        color: var(--text-color);
+        background-color: var(--bg-color);
+        margin: 0;
+        height: 100vh;
+        overflow: hidden;
+        line-height: 1.6;
+        transition: background-color 0.2s;
+      }
+      .main.drag-over {
+        background-color: rgba(9, 105, 218, 0.05);
+        outline: 3px dashed var(--btn-select-bg);
+        outline-offset: -12px;
+      }
+      .app {
+        position: relative;
+        display: grid;
+        height: 100vh;
+        grid-template-columns: var(--sidebar-width, 240px) 1fr;
+        grid-template-rows: auto 1fr;
+        grid-template-areas: "top top"
+                             "side main";
+        transition: grid-template-columns .2s ease;
+      }
+      .app.resizing {
+        transition: none;
+      }
+      .sidebar-resizer {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: var(--sidebar-width, 240px);
+        width: 6px;
+        transform: translateX(-3px);
+        cursor: col-resize;
+        z-index: 10;
+        background: transparent;
+      }
+      .sidebar-resizer:hover {
+        background: var(--btn-select-bg);
+        opacity: .25;
+      }
+      html.sidebar-collapsed .sidebar-resizer {
+        display: none;
+      }
+      html.sidebar-collapsed .app {
+        grid-template-columns: 0 1fr;
+      }
+      html.sidebar-collapsed .sidebar {
+        overflow: hidden;
+        padding-left: 0;
+        padding-right: 0;
+        border-right: none;
+      }
+      .topbar {
+        grid-area: top;
+        display: grid;
+        grid-template-columns: 1fr auto auto; /* marca | acciones | controles */
+        align-items: center;
+        gap: 0.5rem;
+        border-bottom: 1px solid var(--border-color);
+        padding: 0.5rem 1rem;
+        background-color: var(--chrome-bg);
+      }
+
+/* --- Pantalla completa: auto-ocultar topbar --- */
+#fs-reveal-zone { display: none; }
+html.fullscreen #fs-reveal-zone {
+  display: block;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  z-index: 901;
+}
+html.fullscreen .app { grid-template-rows: 0 1fr; }
+html.fullscreen .topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 900;
+  transform: translateY(-100%);
+  transition: transform .2s ease;
+}
+html.fullscreen.topbar-peek .topbar { transform: translateY(0); }
+      .app-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: var(--text-color);
+        user-select: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 0; /* deja que el título se trunque en vez de romper la barra */
+      }
+      .topbar-actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        flex-wrap: nowrap;
+      }
+      /* --- Popover "Aa" de ajustes de lectura --- */
+      .reading-popover {
+        position: fixed;
+        z-index: 960;
+        background-color: var(--chrome-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.22);
+        padding: 6px;
+        min-width: 230px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .reading-popover.hidden { display: none; }
+      .reading-popover .rp-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 6px 8px;
+        font-size: 0.9rem;
+        color: var(--text-color);
+      }
+      .reading-popover .rp-label { font-weight: 500; }
+      .reading-popover .rp-controls { display: inline-flex; align-items: center; gap: 4px; }
+      /* --- Barra de título propia: controles de ventana --- */
+      .window-controls {
+        display: flex;
+        gap: 2px;
+        align-items: center;
+        margin-left: 4px;
+      }
+      .window-controls button {
+        width: 34px;
+        height: 34px;
+        padding: 8px;
+        box-sizing: border-box;
+        background: transparent;
+        color: var(--btn-toggle-color);
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.15s, color 0.15s;
+      }
+      .window-controls button:hover { background-color: var(--btn-toggle-hover-bg); }
+      #win-close:hover { background-color: #e81123; color: #fff; }
+      /* Grips de redimensionado (ventana sin marco) */
+      .resize-grip { position: fixed; z-index: 950; }
+      html.fullscreen .resize-grip { display: none; }
+
+      /* --- macOS: convivir con el semáforo nativo ---
+         En macOS la ventana SÍ lleva decoraciones (`tauri.macos.conf.json`), porque
+         es la única forma de conservar el semáforo nativo con su comportamiento
+         esperado: hover, y el botón verde entrando a pantalla completa. Con
+         `titleBarStyle: Overlay` el contenido se dibuja por debajo de la barra, así
+         que nuestra topbar comparte esa franja con los tres puntitos.
+         Delta MÍNIMO, y solo bajo `html.macos` (INV-1: Windows y Linux quedan
+         idénticos a como estaban).
+         SIN VERIFICAR en macOS: estas tres reglas están escritas desde Linux contra
+         la documentación; el árbitro es un Mac real con una persona mirándolo. */
+      html.macos .window-controls { display: none; }  /* los da el sistema */
+      html.macos .resize-grip { display: none; }      /* redimensiona el sistema */
+      /* Corre la marca para que "Lekto" no quede debajo de los puntitos.
+         Cuenta: semáforo en x=20 + 3 puntos de 12px + 2 separaciones de ~8px ≈ 72px
+         de borde derecho; 78px deja un respiro de 6px. */
+      html.macos .brand { padding-left: 78px; }
+      .rg-n  { top: 0; left: 10px; right: 10px; height: 5px; cursor: ns-resize; }
+      .rg-s  { bottom: 0; left: 10px; right: 10px; height: 5px; cursor: ns-resize; }
+      .rg-e  { top: 10px; bottom: 10px; right: 0; width: 5px; cursor: ew-resize; }
+      .rg-w  { top: 10px; bottom: 10px; left: 0; width: 5px; cursor: ew-resize; }
+      .rg-ne { top: 0; right: 0; width: 10px; height: 10px; cursor: nesw-resize; }
+      .rg-nw { top: 0; left: 0; width: 10px; height: 10px; cursor: nwse-resize; }
+      .rg-se { bottom: 0; right: 0; width: 10px; height: 10px; cursor: nwse-resize; }
+      .rg-sw { bottom: 0; left: 0; width: 10px; height: 10px; cursor: nesw-resize; }
+      .sidebar {
+        grid-area: side;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        overflow-y: auto;
+        border-right: 1px solid var(--border-color);
+        padding: 1rem;
+        background-color: var(--chrome-bg);
+      }
+
+      .panes {
+        grid-area: main;
+        display: flex;
+        position: relative;
+        min-width: 0;
+        min-height: 0;
+        overflow: hidden;
+      }
+      .main-col {
+        flex: 1 1 0;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .main {
+        flex: 1 1 0;
+        min-width: 0;
+        overflow-y: auto;
+        padding: 2rem clamp(1rem, 4vw, 3rem);
+      }
+      .split-pane {
+        flex: 1 1 0;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        border-left: 1px solid var(--border-color);
+      }
+      .split-pane.hidden { display: none; }
+      /* Anillo del panel con foco — solo visible cuando el split está activo */
+      .panes.split-active .main-col.pane-focused,
+      .panes.split-active #split-pane.pane-focused {
+        box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--link-color) 55%, transparent);
+      }
+      .split-pane-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 0.5rem 0.4rem 0.9rem;
+        border-bottom: 1px solid var(--border-color);
+        background: var(--chrome-bg);
+      }
+      .split-pane-title {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-color);
+      }
+      .split-pane-close {
+        display: flex;
+        align-items: center;
+        background: transparent;
+        border: none;
+        color: var(--text-color);
+        cursor: pointer;
+        padding: 4px;
+        border-radius: 4px;
+        opacity: 0.6;
+      }
+      .split-pane-close:hover { opacity: 1; background: var(--btn-toggle-hover-bg); }
+      .split-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 2rem clamp(1rem, 3vw, 2rem);
+      }
+
+      .drop-zone-right {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 45%;
+        z-index: 5;
+        pointer-events: none;
+        display: none;
+        box-sizing: border-box;
+        background: color-mix(in srgb, var(--link-color) 12%, transparent);
+        border-left: 2px dashed var(--link-color);
+      }
+      .drop-zone-right.visible { display: block; }
+      .drop-zone-left {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 45%;
+        z-index: 5;
+        pointer-events: none;
+        display: none;
+        box-sizing: border-box;
+        background: color-mix(in srgb, var(--link-color) 12%, transparent);
+        border-right: 2px dashed var(--link-color);
+      }
+      .drop-zone-left.visible { display: block; }
+      .tab-drag-ghost {
+        position: fixed;
+        z-index: 1000;
+        pointer-events: none;
+        padding: 4px 10px;
+        max-width: 220px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 0.85rem;
+        background: var(--bg-color);
+        color: var(--text-color);
+        border: 1px solid var(--link-color);
+        border-radius: 6px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+      }
+      body.tab-dragging {
+        user-select: none;
+        cursor: grabbing;
+      }
+
+      .tabbar {
+        display: flex;
+        align-items: stretch;
+        gap: 2px;
+        overflow-x: auto;
+        /* Si un eje es 'visible' y el otro no, CSS convierte el visible en 'auto'.
+           Sin este hidden explicito, la tira de pestanas queda con una barra
+           vertical propia: en Linux es invisible (overlay), pero en Windows el
+           WebView2 dibuja los botones de flecha y aparecen dos flechitas sobre
+           las pestanas. La tira nunca scrollea en vertical, asi que se apaga. */
+        overflow-y: hidden;
+        background: var(--chrome-bg);
+        border-bottom: 1px solid var(--border-color);
+        padding: 4px 8px 0;
+      }
+      .tabbar.hidden { display: none; }
+      .tab {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        max-width: 220px;
+        border: 1px solid var(--border-color);
+        border-bottom: none;
+        border-radius: 6px 6px 0 0;
+        background: var(--btn-toggle-bg);
+        color: var(--text-color);
+        cursor: pointer;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: none;
+      }
+      .tab.active {
+        background: var(--bg-color);
+        margin-bottom: -1px;
+        padding-bottom: 7px;
+        font-weight: 600;
+        box-shadow: inset 0 2px 0 var(--link-color);
+      }
+      .tab-label { overflow: hidden; text-overflow: ellipsis; }
+      .tab-close {
+        display: flex;
+        align-items: center;
+        background: transparent;
+        border: none;
+        color: inherit;
+        cursor: pointer;
+        padding: 2px;
+        border-radius: 4px;
+        opacity: 0.6;
+      }
+      .tab-close:hover { opacity: 1; background: var(--btn-toggle-hover-bg); }
+
+      #lang-toggle {
+        padding: 0.6rem 1.2rem;
+        background-color: var(--btn-toggle-bg);
+        color: var(--btn-toggle-color);
+        border: 1px solid var(--btn-toggle-border);
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #lang-toggle:hover {
+        background-color: var(--btn-toggle-hover-bg);
+      }
+      #export-html, #export-pdf, #search-toggle, #theme-toggle, #sidebar-toggle, #zoom-in, #zoom-out, #split-toggle, #app-menu-btn, #quick-open-btn, #reading-btn {
+        width: 38px;
+        height: 38px;
+        padding: 10px;
+        box-sizing: border-box;
+        background-color: var(--btn-toggle-bg);
+        color: var(--btn-toggle-color);
+        border: 1px solid var(--btn-toggle-border);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #export-html:hover, #export-pdf:hover, #search-toggle:hover, #theme-toggle:hover, #sidebar-toggle:hover, #zoom-in:hover, #zoom-out:hover, #split-toggle:hover, #app-menu-btn:hover, #quick-open-btn:hover, #reading-btn:hover {
+        background-color: var(--btn-toggle-hover-bg);
+      }
+      #search-toggle.active {
+        background-color: var(--btn-toggle-hover-bg);
+        border-color: var(--input-focus-border);
+      }
+
+      /* --- Responsive de la topbar (overflow al ☰) ---
+         Debe ir DESPUÉS de la regla base de botones para que display:none gane
+         por orden de fuente (misma especificidad de id; la media query no suma).
+         Breakpoint 600px: por encima cabe la barra completa con el wordmark "Lekto"
+         sin truncar; por debajo (hasta minWidth 360) colapsa + densifica, y "Lekto"
+         sigue completo. Así el wordmark nunca se corta en ningún ancho. */
+      @media (max-width: 600px) {
+        /* Exportar HTML / Exportar PDF / Dividir salen de la barra (van al menú ☰) */
+        #export-html,
+        #export-pdf,
+        #split-toggle {
+          display: none;
+        }
+        /* Densificar el cromo para conservar el wordmark "Lekto" hasta 360px.
+           No mueve más acciones: solo aprieta tamaños y gaps. */
+        .topbar { padding: 0.5rem 0.55rem; gap: 0.35rem; }
+        .topbar-actions { gap: 0.25rem; }
+        #export-html, #export-pdf, #search-toggle, #theme-toggle, #sidebar-toggle,
+        #zoom-in, #zoom-out, #split-toggle, #app-menu-btn, #quick-open-btn, #reading-btn {
+          width: 32px; height: 32px; padding: 7px;
+        }
+        .window-controls { margin-left: 2px; }
+        .window-controls button { width: 28px; height: 28px; }
+        .app-title { font-size: 0.95rem; }
+      }
+      /* Theme toggle icon display rules */
+      #theme-toggle .icon-sun {
+        display: none;
+      }
+      #theme-toggle .icon-moon {
+        display: block;
+      }
+      [data-theme="dark"] #theme-toggle .icon-sun {
+        display: block;
+      }
+      [data-theme="dark"] #theme-toggle .icon-moon {
+        display: none;
+      }
+      /* Win-max: cuadrado (ventana) / dos-cuadrados (maximizada) / esquinas (fullscreen).
+         Las reglas de fullscreen van DESPUÉS para ganar por orden cuando coinciden. */
+      #win-max .icon-restore-max, #win-max .icon-restore { display: none; }
+      html.maximized #win-max .icon-max { display: none; }
+      html.maximized #win-max .icon-restore-max { display: block; }
+      html.fullscreen #win-max .icon-max,
+      html.fullscreen #win-max .icon-restore-max { display: none; }
+      html.fullscreen #win-max .icon-restore { display: block; }
+      #search-container {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        margin-left: 0.5rem;
+      }
+      #search-container.hidden {
+        display: none;
+      }
+      #search-input {
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--input-border);
+        background-color: var(--input-bg);
+        color: var(--input-color);
+        border-radius: 6px;
+        font-size: 0.9rem;
+        outline: none;
+        width: 180px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      #search-input:focus {
+        border-color: var(--input-focus-border);
+        box-shadow: 0 0 0 3px var(--input-focus-shadow);
+      }
+      #search-counter {
+        font-size: 0.85rem;
+        color: var(--text-color);
+        opacity: 0.7;
+        min-width: 45px;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+      }
+      #search-prev, #search-next, #search-close {
+        background-color: var(--btn-toggle-bg);
+        color: var(--btn-toggle-color);
+        border: 1px solid var(--btn-toggle-border);
+        border-radius: 6px;
+        cursor: pointer;
+        padding: 0.5rem;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        transition: background-color 0.2s, border-color 0.2s;
+      }
+      #search-prev:hover, #search-next:hover, #search-close:hover {
+        background-color: var(--btn-toggle-hover-bg);
+      }
+      .search-match {
+        background-color: rgba(255, 223, 0, 0.45);
+        color: inherit;
+        border-radius: 2px;
+        transition: background-color 0.2s;
+      }
+      [data-theme="dark"] .search-match {
+        background-color: rgba(255, 223, 0, 0.25);
+      }
+      .search-match-active {
+        background-color: #ff9632 !important;
+        color: #000000 !important;
+        box-shadow: 0 0 0 1px #ff7300;
+      }
+      #error {
+        color: var(--error-color);
+        min-height: 1.2em;
+        margin: 0 auto 1rem auto;
+        max-width: 900px;
+        font-size: 0.9rem;
+      }
+      #content {
+        word-break: break-word;
+        padding-top: 1rem;
+        max-width: var(--content-width, 900px);
+        margin: 0 auto;
+        zoom: var(--content-zoom, 1);
+      }
+      /* El panel derecho aplica sus PROPIAS variables de lectura. */
+      #content-right {
+        word-break: break-word;
+        max-width: var(--content-width, 900px);
+        margin: 0 auto;
+        zoom: var(--content-zoom, 1);
+      }
+      .width-range {
+        width: 92px;
+        cursor: pointer;
+        accent-color: var(--btn-select-bg, #0969da);
+        vertical-align: middle;
+      }
+      /* Diagramas Mermaid */
+      .mermaid-diagram {
+        margin: 1rem 0;
+        text-align: center;
+        overflow-x: auto;
+        overflow-y: hidden; /* mismo motivo que .tabbar */
+        width: 100%;
+        max-width: 100%;
+      }
+      .mermaid-diagram svg {
+        display: block;
+        margin: 0 auto;
+        height: auto; /* tamaño natural; el scroll horizontal lo da .mermaid-diagram */
+      }
+      .mermaid-diagram.mermaid-error {
+        text-align: left;
+        white-space: pre-wrap;
+        font-family: monospace;
+        color: var(--error-color);
+        border: 1px solid var(--error-color);
+        border-radius: 6px;
+        padding: 0.75rem;
+      }
+      /* KaTeX Math Display */
+      .katex-display {
+        overflow-x: auto;
+        overflow-y: hidden;
+      }
+      /* Markdown elements styling */
+      #content h1 {
+        font-size: 1.8rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0.3em;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
+      #content h2 {
+        font-size: 1.4rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 0.3em;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
+      #content h3 {
+        font-size: 1.2rem;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+      }
+      #content code {
+        font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+        font-size: 85%;
+        background-color: var(--code-bg);
+        padding: 0.2em 0.4em;
+        border-radius: 6px;
+      }
+      #content pre {
+        position: relative;
+        background-color: var(--pre-bg);
+        padding: 1rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        overflow-y: hidden; /* mismo motivo que .tabbar */
+        border: 1px solid var(--border-color);
+        margin: 1rem 0;
+      }
+      .copy-btn { position:absolute; top:.4rem; right:.4rem; display:flex; align-items:center; gap:.3rem; padding:.25rem .4rem; font-size:.75rem; line-height:1; background:var(--btn-toggle-bg); color:var(--btn-toggle-color); border:1px solid var(--btn-toggle-border); border-radius:5px; cursor:pointer; opacity:0; transition:opacity .15s; }
+      #content pre:hover .copy-btn { opacity:1; }
+      .copy-btn:hover { background:var(--btn-toggle-hover-bg); }
+      .copy-btn.copied { opacity:1; }
+      #content pre code {
+        background-color: transparent;
+        padding: 0;
+        font-size: 0.9rem;
+        border-radius: 0;
+      }
+      #content ul {
+        padding-left: 2rem;
+        margin: 1rem 0;
+      }
+      #content a {
+        color: var(--link-color);
+        text-decoration: none;
+        transition: text-decoration 0.2s;
+      }
+      #content a:hover {
+        text-decoration: underline;
+      }
+      #content table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 1.5rem 0;
+      }
+      #content th, #content td {
+        border: 1px solid var(--border-color);
+        padding: 0.6rem 1rem;
+        text-align: left;
+      }
+      #content th {
+        background-color: var(--pre-bg);
+        font-weight: 600;
+      }
+      /* Callouts estilo GitHub */
+      .callout { border:1px solid var(--border-color); border-left:4px solid var(--border-color); border-radius:6px; padding:.6rem 1rem; margin:1rem 0; }
+      .callout > :last-child { margin-bottom:0; }
+      .callout-title { display:flex; align-items:center; gap:.5rem; font-weight:600; margin-bottom:.4rem; }
+      .callout-title svg { flex-shrink:0; }
+      .callout-note { border-left-color:#0969da; } .callout-note .callout-title { color:#0969da; }
+      .callout-tip { border-left-color:#1a7f37; } .callout-tip .callout-title { color:#1a7f37; }
+      .callout-important { border-left-color:#8250df; } .callout-important .callout-title { color:#8250df; }
+      .callout-warning { border-left-color:#9a6700; } .callout-warning .callout-title { color:#9a6700; }
+      .callout-caution { border-left-color:#cf222e; } .callout-caution .callout-title { color:#cf222e; }
+      [data-theme="dark"] .callout-note { border-left-color:#58a6ff; } [data-theme="dark"] .callout-note .callout-title { color:#58a6ff; }
+      [data-theme="dark"] .callout-tip { border-left-color:#3fb950; } [data-theme="dark"] .callout-tip .callout-title { color:#3fb950; }
+      [data-theme="dark"] .callout-important { border-left-color:#a371f7; } [data-theme="dark"] .callout-important .callout-title { color:#a371f7; }
+      [data-theme="dark"] .callout-warning { border-left-color:#d29922; } [data-theme="dark"] .callout-warning .callout-title { color:#d29922; }
+      [data-theme="dark"] .callout-caution { border-left-color:#f85149; } [data-theme="dark"] .callout-caution .callout-title { color:#f85149; }
+
+      .side-section {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+      .side-section-header {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: var(--text-color);
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+      }
+      .side-section-header:hover {
+        background-color: var(--btn-toggle-hover-bg);
+      }
+      .side-section-header span {
+        flex: 1;
+        text-align: left;
+      }
+      .chevron {
+        transition: transform 0.15s;
+        transform: rotate(90deg);
+        flex-shrink: 0;
+      }
+      .side-section.collapsed .chevron {
+        transform: rotate(0deg);
+      }
+      .side-section.collapsed .side-section-body {
+        display: none;
+      }
+      .toc-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .toc-item {
+        width: 100%;
+        text-align: left;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: var(--text-color);
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+        border-radius: 6px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: block;
+        transition: background-color 0.2s;
+        flex: 1;
+        min-width: 0;
+      }
+      .toc-item:hover {
+        background-color: var(--btn-toggle-hover-bg);
+      }
+      .toc-h2 {
+        padding-left: 1rem;
+      }
+      .toc-h3 {
+        padding-left: 2rem;
+      }
+      .toc-empty {
+        color: var(--text-color);
+        opacity: 0.6;
+        font-size: 0.85rem;
+        padding: 0.6rem 0.8rem;
+        list-style: none;
+      }
+      .toc-row {
+        display: flex;
+        align-items: center;
+      }
+      .toc-pin {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: var(--text-color);
+        opacity: 0;
+        transition: opacity .15s;
+        padding: 0.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        flex-shrink: 0;
+      }
+      .toc-row:hover .toc-pin {
+        opacity: 0.6;
+      }
+      .toc-row:hover .toc-pin:hover {
+        opacity: 1;
+      }
+      .toc-pin.active {
+        opacity: 1 !important;
+        color: var(--btn-select-bg) !important;
+      }
+      .pinned-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .pinned-row {
+        display: flex;
+        align-items: center;
+      }
+      .pinned-item {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        flex: 1;
+        min-width: 0;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.6rem;
+        border-radius: 6px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--text-color);
+        transition: background-color 0.2s;
+      }
+      .pinned-item:hover {
+        background-color: var(--btn-toggle-hover-bg);
+      }
+      .pinned-remove {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        color: var(--text-color);
+        opacity: 0;
+        transition: opacity .15s;
+        padding: 0.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        flex-shrink: 0;
+      }
+      .pinned-row:hover .pinned-remove {
+        opacity: 0.6;
+      }
+      .pinned-row:hover .pinned-remove:hover {
+        opacity: 1;
+        color: var(--error-color);
+      }
+      .pinned-empty {
+        color: var(--text-color);
+        opacity: 0.6;
+        font-size: 0.85rem;
+        padding: 0.6rem 0.8rem;
+        list-style: none;
+      }
+      .recents-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .recent-item {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 0.8rem;
+        background: transparent;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        text-align: left;
+        color: var(--text-color);
+        transition: background-color 0.2s;
+      }
+      .recent-item:hover {
+        background: var(--btn-toggle-hover-bg);
+      }
+      .recent-item svg {
+        flex-shrink: 0;
+      }
+      .recent-item span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        flex: 1;
+      }
+      .recents-empty {
+        color: var(--text-color);
+        opacity: 0.6;
+        font-size: 0.85rem;
+        padding: 0.6rem 0.8rem;
+        list-style: none;
+      }
+      .recents-row { display:flex; align-items:center; }
+      .recents-row .recent-item { flex:1; min-width:0; }
+      .recent-remove { opacity:0; flex-shrink:0; background:transparent; border:none; color:var(--text-color); cursor:pointer; padding:4px; margin-right:2px; border-radius:4px; display:flex; align-items:center; transition:opacity .15s, background-color .2s; }
+      .recents-row:hover .recent-remove { opacity:0.55; }
+      .recent-remove:hover { opacity:1; background:var(--btn-toggle-hover-bg); }
+      .recents-actions { list-style:none; margin-top:4px; }
+      .recents-clear { display:flex; align-items:center; gap:.4rem; width:100%; background:transparent; border:none; color:var(--text-color); opacity:0.7; cursor:pointer; font-size:0.85rem; padding:0.4rem 0.8rem; border-radius:6px; transition:background-color .2s, opacity .2s; }
+      .recents-clear:hover { opacity:1; background:var(--btn-toggle-hover-bg); }
+      .context-menu { position:fixed; z-index:1000; background:var(--chrome-bg); border:1px solid var(--border-color); border-radius:6px; box-shadow:0 6px 20px rgba(0,0,0,.22); padding:4px; min-width:150px; }
+      .context-menu button { display:block; width:100%; text-align:left; background:transparent; border:none; color:var(--text-color); cursor:pointer; padding:6px 10px; border-radius:4px; font-size:0.9rem; }
+      .context-menu button:hover { background:var(--btn-toggle-hover-bg); }
+      @media print { .context-menu { display:none !important; } }
+      .modal-overlay { position:fixed; inset:0; z-index:2000; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,.45); }
+      .modal-overlay.hidden { display:none; }
+      .modal { position:relative; background:var(--chrome-bg); color:var(--text-color); border:1px solid var(--border-color); border-radius:10px; padding:1.6rem 1.9rem; min-width:260px; max-width:360px; text-align:center; box-shadow:0 10px 40px rgba(0,0,0,.35); }
+      .modal-close { position:absolute; top:8px; right:8px; display:flex; align-items:center; background:transparent; border:none; color:var(--text-color); cursor:pointer; opacity:.6; padding:4px; border-radius:4px; }
+      .modal-close:hover { opacity:1; background:var(--btn-toggle-hover-bg); }
+      .about-name { margin:.2rem 0 0; font-size:1.4rem; }
+      .about-version { opacity:.7; font-size:.85rem; margin:.3rem 0 1rem; }
+      .about-desc { margin:.25rem 0; }
+      .about-tech { opacity:.6; font-size:.8rem; margin:.6rem 0 0; }
+      .about-legal { opacity:.55; font-size:.75rem; margin:.5rem 0 0; }
+      /* La URL se muestra como texto seleccionable, no como <a>: abrir un link en la
+         webview sacaría a la app de su propio documento, y un plugin solo para esto
+         sumaría peso al binario (Pilar 0). */
+      .about-repo { margin:.15rem 0 0; }
+      .about-url { font-size:.75rem; opacity:.75; user-select:text; cursor:text; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+      @media print { .modal-overlay { display:none !important; } }
+
+
+
+      @media print {
+        :root, [data-theme="dark"] {
+          --bg-color: #ffffff !important;
+          --chrome-bg: #ffffff !important;
+          --text-color: #000000 !important;
+          --border-color: #000000 !important;
+          --code-bg: rgba(0, 0, 0, 0.05) !important;
+          --pre-bg: #f6f8fa !important;
+          --link-color: #0000ee !important;
+        }
+
+        body {
+          background-color: #ffffff !important;
+          color: #000000 !important;
+          max-width: 100% !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          height: auto !important;
+          overflow: visible !important;
+        }
+
+        .app {
+          display: block !important;
+          height: auto !important;
+        }
+
+        .main {
+          display: block !important;
+          overflow: visible !important;
+          padding: 0 !important;
+        }
+        .panes { display: block !important; overflow: visible !important; }
+
+        .topbar,
+        .sidebar,
+        .sidebar-resizer,
+        .width-range,
+        #search-container,
+        #error,
+        .copy-btn,
+        .tabbar,
+        #drop-zone-right,
+        #drop-zone-left {
+          display: none !important;
+        }
+
+        /* Impresión — se imprime UN panel: el que tiene el foco.
+           Sin la clase `focus-right` (= sin split, o foco a la izquierda) esta cascada
+           es idéntica a la de antes: se imprime #content y el panel derecho no existe. */
+        #split-pane { display: none !important; }
+        .split-pane-header { display: none !important; }
+
+        html.focus-right #split-pane {
+          display: block !important;
+          border-left: none !important;
+          overflow: visible !important;
+        }
+        html.focus-right .main-col { display: none !important; }
+
+        #content-right {
+          padding: 0 !important;
+          margin: 0 !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          zoom: 1 !important;
+          overflow: visible !important;
+        }
+
+        #content {
+          padding: 0 !important;
+          margin: 0 !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          zoom: 1 !important;
+        }
+
+        /* Ensure tables, code and pre have visible dark borders/formatting when printing */
+        #content table, #content-right table, 
+        #content th, #content-right th, 
+        #content td, #content-right td {
+          border: 1px solid #000000 !important;
+        }
+        
+        #content pre, #content-right pre {
+          border: 1px solid #000000 !important;
+          background-color: #f6f8fa !important;
+          /* En papel no hay scroll horizontal: envolver en vez de cortarse a la derecha. */
+          white-space: pre-wrap !important;
+          overflow-wrap: anywhere !important;
+          word-break: break-word !important;
+          overflow: visible !important;
+          /* auto (no "avoid"): un bloque más alto que la página puede partirse en vez de recortarse. */
+          page-break-inside: auto;
+        }
+
+        #content pre code, #content-right pre code {
+          white-space: pre-wrap !important;
+          overflow-wrap: anywhere !important;
+          word-break: break-word !important;
+        }
+
+        #content code, #content-right code {
+          background-color: rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* Prevent search match highlights from ruining print layout or legibility */
+        .search-match, .search-match-active {
+          background-color: transparent !important;
+          color: inherit !important;
+          box-shadow: none !important;
+          border: none !important;
+        }
+      }
+
+.empty-state {
+  min-height: 100%; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 1.4rem; padding: 2rem; text-align: center; box-sizing: border-box;
+}
+.empty-logo { display: flex; align-items: center; gap: 0.6rem; color: var(--text-color); }
+.empty-logo svg { color: var(--link-color); }
+.empty-logo span { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.01em; }
+.empty-hint { font-size: 0.98rem; color: var(--text-color); opacity: 0.7; max-width: 30rem; margin: 0; }
+.empty-hint kbd, .empty-recents-hint kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.82em;
+  background: var(--btn-toggle-bg); border: 1px solid var(--border-color); border-bottom-width: 2px;
+  border-radius: 5px; padding: 1px 6px; color: var(--text-color);
+}
+.empty-features {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.8rem;
+  max-width: 40rem; width: 100%; margin-top: 0.2rem;
+}
+.empty-feature {
+  border: 1px solid var(--border-color); border-radius: 9px; padding: 0.9rem 0.8rem;
+  background: var(--chrome-bg); text-align: left;
+}
+.empty-feature svg { color: var(--link-color); margin-bottom: 0.4rem; }
+.empty-feature-title { display: block; font-size: 0.9rem; margin-bottom: 0.2rem; }
+.empty-feature-desc { margin: 0; font-size: 0.78rem; color: var(--text-color); opacity: 0.65; line-height: 1.45; }
+.empty-recents { width: 100%; max-width: 40rem; }
+.empty-recents-head {
+  font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text-color); opacity: 0.55; margin: 0 0 0.7rem; text-align: left;
+}
+.empty-rec-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem; }
+.empty-rec-card {
+  display: flex; align-items: center; gap: 0.7rem; border: 1px solid var(--border-color);
+  border-radius: 9px; padding: 0.85rem 1rem; background: var(--chrome-bg); color: var(--text-color);
+  cursor: pointer; text-align: left; font: inherit; transition: background 0.15s, border-color 0.15s;
+}
+.empty-rec-card:hover { background: var(--btn-toggle-hover-bg); border-color: var(--link-color); }
+.empty-rec-card svg { color: var(--text-color); opacity: 0.6; flex: 0 0 auto; }
+.empty-rec-text { min-width: 0; display: flex; flex-direction: column; }
+.empty-rec-name { font-size: 0.9rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.empty-rec-path { font-size: 0.74rem; color: var(--text-color); opacity: 0.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.empty-recents-hint { font-size: 0.85rem; color: var(--text-color); opacity: 0.6; margin-top: 0.9rem; text-align: center; }
+@media (max-width: 720px) {
+  .empty-features, .empty-rec-grid { grid-template-columns: minmax(0, 1fr); }
+}
+      }
+    </style>
+    <link rel="stylesheet" href="vendor/hljs-light.css" />
+    <link rel="stylesheet" href="vendor/hljs-dark.css" />
+    <script src="vendor/highlight.min.js"></script>
+    <script src="main.js"></script>
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar" data-tauri-drag-region>
+        <div class="brand" data-tauri-drag-region>
+          <button id="sidebar-toggle" title="Alternar panel" aria-label="Alternar panel" data-i18n-title="sidebarTitle" data-i18n-aria="sidebarAria"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></svg></button>
+          <span class="app-title" data-tauri-drag-region>Lekto</span>
+        </div>
+        <div class="topbar-actions">
+          <button id="app-menu-btn" title="Menú" aria-label="Menú" data-i18n-title="menuTitle" data-i18n-aria="menuTitle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+          <button id="quick-open-btn" title="Abrir archivo" aria-label="Abrir archivo" data-i18n-title="quickOpenTitle" data-i18n-aria="quickOpenTitle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg></button>
+          <button id="export-html" title="Exportar HTML" aria-label="Exportar HTML" data-i18n-title="exportHtmlTitle" data-i18n-aria="exportHtmlAria">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <path d="M14 2v6h6"/>
+              <path d="m9 13-2 2 2 2"/>
+              <path d="m15 13 2 2-2 2"/>
+            </svg>
+          </button>
+          <button id="export-pdf" title="Exportar PDF" aria-label="Exportar PDF" data-i18n-title="exportPdfTitle" data-i18n-aria="exportPdfAria">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6 9V2h12v7"/>
+              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+              <rect x="6" y="14" width="12" height="8" rx="1"/>
+            </svg>
+          </button>
+          <div id="search-container" class="hidden">
+            <input id="search-input" type="text" placeholder="Buscar..." aria-label="Texto a buscar" data-i18n-placeholder="searchPlaceholder" data-i18n-aria="searchInputAria" />
+            <span id="search-counter">0/0</span>
+            <button id="search-prev" aria-label="Anterior" data-i18n-aria="searchPrev">◀</button>
+            <button id="search-next" aria-label="Siguiente" data-i18n-aria="searchNext">▶</button>
+            <button id="search-close" aria-label="Cerrar" data-i18n-aria="searchClose">✕</button>
+          </div>
+          <button id="search-toggle" title="Buscar" aria-label="Buscar" data-i18n-title="searchTitle" data-i18n-aria="searchAria">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="m21 21-4.35-4.35"/>
+            </svg>
+          </button>
+          <button id="split-toggle" title="Dividir pantalla" aria-label="Dividir pantalla" data-i18n-title="splitTitle" data-i18n-aria="splitAria">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/></svg>
+          </button>
+          <button id="reading-btn" title="Ajustes de lectura" aria-label="Ajustes de lectura" data-i18n-title="readingTitle" data-i18n-aria="readingTitle" style="font-weight:600; font-size:0.95rem;">Aa</button>
+          <div id="reading-popover" class="reading-popover hidden" role="menu" aria-label="Ajustes de lectura">
+            <div class="rp-row">
+              <span class="rp-label" data-i18n="readingTheme">Tema</span>
+              <span class="rp-controls">
+                <button id="theme-toggle" title="Cambiar tema" aria-label="Cambiar tema" data-i18n-title="themeTitle" data-i18n-aria="themeAria">
+                  <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 3a6.36 6.36 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+                  </svg>
+                  <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2"/>
+                    <path d="M12 20v2"/>
+                    <path d="m4.93 4.93 1.41 1.41"/>
+                    <path d="m17.66 17.66 1.41 1.41"/>
+                    <path d="M2 12h2"/>
+                    <path d="M20 12h2"/>
+                    <path d="m6.34 17.66-1.41 1.41"/>
+                    <path d="m19.07 4.93-1.41 1.41"/>
+                  </svg>
+                </button>
+              </span>
+            </div>
+            <div class="rp-row">
+              <span class="rp-label" data-i18n="readingZoom">Zoom</span>
+              <span class="rp-controls">
+                <button id="zoom-out" title="Alejar (Ctrl −)" aria-label="Alejar"
+                        data-i18n-title="zoomOutTitle" data-i18n-aria="zoomOutAria">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="8" x2="14" y1="11" y2="11"/></svg>
+                </button>
+                <button id="zoom-in" title="Acercar (Ctrl +)" aria-label="Acercar"
+                        data-i18n-title="zoomInTitle" data-i18n-aria="zoomInAria">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></svg>
+                </button>
+              </span>
+            </div>
+            <div class="rp-row">
+              <span class="rp-label" data-i18n="readingWidth">Ancho de lectura</span>
+              <span class="rp-controls">
+                <input type="range" id="width-range" class="width-range" min="600" max="1400" step="20" title="Ancho de lectura" aria-label="Ancho de lectura" data-i18n-title="widthTitle" data-i18n-aria="widthAria">
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="window-controls">
+          <button id="win-min" title="Minimizar" aria-label="Minimizar" data-i18n-title="winMinTitle" data-i18n-aria="winMinTitle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button id="win-max" title="Maximizar" aria-label="Maximizar" data-i18n-title="winMaxTitle" data-i18n-aria="winMaxTitle"><svg class="icon-max" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="1"/></svg><svg class="icon-restore-max" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="13" height="13" rx="1"/><path d="M8 8V4a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-4"/></svg><svg class="icon-restore" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg></button>
+          <button id="win-close" title="Cerrar" aria-label="Cerrar" data-i18n-title="winCloseTitle" data-i18n-aria="winCloseTitle"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+        </div>
+      </header>
+      <div id="fs-reveal-zone" aria-hidden="true"></div>
+      <div class="resize-grip rg-n"  data-dir="North"     aria-hidden="true"></div>
+      <div class="resize-grip rg-s"  data-dir="South"     aria-hidden="true"></div>
+      <div class="resize-grip rg-e"  data-dir="East"      aria-hidden="true"></div>
+      <div class="resize-grip rg-w"  data-dir="West"      aria-hidden="true"></div>
+      <div class="resize-grip rg-ne" data-dir="NorthEast" aria-hidden="true"></div>
+      <div class="resize-grip rg-nw" data-dir="NorthWest" aria-hidden="true"></div>
+      <div class="resize-grip rg-se" data-dir="SouthEast" aria-hidden="true"></div>
+      <div class="resize-grip rg-sw" data-dir="SouthWest" aria-hidden="true"></div>
+      <aside class="sidebar">
+        <section class="side-section" id="section-pinned">
+          <button class="side-section-header"><svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg> <span data-i18n="pinnedTitle">Fijados</span></button>
+          <div class="side-section-body"><ul id="pinned" class="pinned-list"></ul></div>
+        </section>
+        <section class="side-section" id="section-toc">
+          <button class="side-section-header"><svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg> <span data-i18n="tocTitle">Índice</span></button>
+          <div class="side-section-body"><ul id="toc" class="toc-list"></ul></div>
+        </section>
+        <section class="side-section" id="section-recents">
+          <button class="side-section-header"><svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg> <span data-i18n="recentsTitle">Recientes</span></button>
+          <div class="side-section-body"><ul id="recents" class="recents-list"></ul></div>
+        </section>
+      </aside>
+      <div class="panes">
+        <div class="main-col">
+          <nav id="tabbar" class="tabbar hidden"></nav>
+          <main class="main">
+            <p id="error" role="alert"></p>
+            <div id="content"></div>
+          </main>
+        </div>
+        <aside id="split-pane" class="split-pane hidden">
+          <nav id="tabbar-right" class="tabbar hidden"></nav>
+          <div id="content-right" class="split-content"></div>
+        </aside>
+        <div id="drop-zone-right" class="drop-zone-right"></div>
+        <div id="drop-zone-left" class="drop-zone-left"></div>
+      </div>
+      <div id="sidebar-resizer" class="sidebar-resizer" aria-hidden="true"></div>
+    </div>
+
+    <div id="about-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="about-name">
+      <div class="modal">
+        <button id="about-close" class="modal-close" aria-label="Cerrar" data-i18n-aria="aboutClose"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+        <h2 id="about-name" class="about-name">Lekto</h2>
+        <p class="about-version"><span data-i18n="aboutVersionLabel">Versión</span> <span id="about-version-num">0.1.0</span></p>
+        <p class="about-desc" data-i18n="aboutDesc">Lector de Markdown minimalista.</p>
+        <p class="about-tech" data-i18n="aboutTech">Hecho con Tauri.</p>
+        <p class="about-legal" data-i18n="aboutLicense">Licencia GPL-3.0</p>
+        <p class="about-repo"><span class="about-url">github.com/Panxio/lekto</span></p>
+        <p class="about-legal">© 2026 Francisco Acevedo Guzmán</p>
+      </div>
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo Squircle de Papel (#f6f8fa) -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#f6f8fa"/>
+
+  <!-- Encabezado Markdown / Título en oscuro (#161b22) -->
+  <rect x="112" y="112" width="288" height="72" rx="16" fill="#161b22"/>
+
+  <!-- Monograma L / Lector en azul acento macizo (#58a6ff) -->
+  <path d="M 112 240 H 200 V 328 H 400 V 400 H 112 Z" fill="#58a6ff"/>
+</svg>

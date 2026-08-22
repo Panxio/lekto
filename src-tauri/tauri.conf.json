@@ -1,0 +1,64 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Lekto",
+  "version": "0.1.0",
+  "identifier": "io.lekto.viewer",
+  "build": {
+    "frontendDist": "../src"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Lekto",
+        "width": 800,
+        "height": 600,
+        "minWidth": 360,
+        "minHeight": 400,
+        "decorations": false,
+        "dragDropEnabled": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "category": "Productivity",
+    "license": "GPL-3.0-only",
+    "publisher": "Francisco Acevedo Guzmán",
+    "copyright": "Copyright © 2026 Francisco Acevedo Guzmán",
+    "homepage": "https://github.com/Panxio/lekto",
+    "shortDescription": "Lector de Markdown minimalista",
+    "longDescription": "Lekto es un lector de Markdown minimalista y liviano para escritorio. Abre archivos .md con render GFM (tablas, listas de tareas, resaltado de sintaxis), vista dividida en dos paneles, tabla de contenidos, búsqueda, recarga automática al cambiar el archivo en disco, y exportación a HTML y PDF. No es un editor.",
+    "fileAssociations": [
+      {
+        "ext": [
+          "md",
+          "markdown"
+        ],
+        "name": "Markdown",
+        "description": "Documento Markdown",
+        "mimeType": "text/markdown",
+        "role": "Viewer",
+        "rank": "Alternate"
+      }
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/48x48.png",
+      "icons/64x64.png",
+      "icons/128x128.png",
+      "icons/256x256.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "linux": {
+      "deb": {
+        "desktopTemplate": "lekto.desktop.template"
+      }
+    }
+  }
+}

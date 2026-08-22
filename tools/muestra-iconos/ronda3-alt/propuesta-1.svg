@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Propuesta 1: "La Hoja Marcada" (The Bookmarked Reading Folio) -->
+  <!-- Base de papel digital claro (#f6f8fa) -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#f6f8fa"/>
+  <!-- Sombra interior del pliegue superior derecho (#161b22) -->
+  <path d="M 336 0 L 512 176 H 336 Z" fill="#161b22"/>
+  <!-- Solapa doblada de la página en azul acento (#58a6ff) -->
+  <path d="M 336 0 L 512 176 V 0 Z" fill="#58a6ff"/>
+  <!-- Cinta marcapáginas de lectura con muesca chevron (#58a6ff) -->
+  <path d="M 160 0 H 288 V 384 L 224 320 L 160 384 Z" fill="#58a6ff"/>
+</svg>

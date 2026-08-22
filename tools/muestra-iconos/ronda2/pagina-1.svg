@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo Squircle de Papel (#f6f8fa) -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#f6f8fa"/>
+
+  <!-- Sombra del pliegue de página en esquina superior derecha (#161b22) -->
+  <path d="M 336 0 L 512 176 H 336 Z" fill="#161b22"/>
+
+  <!-- Solapa doblada de la página (#58a6ff) -->
+  <path d="M 336 0 L 512 176 V 0 Z" fill="#58a6ff"/>
+
+  <!-- Monograma L / Estructura de Lector en azul/oscuro macizo (#161b22) -->
+  <path d="M 128 128 H 224 V 312 H 384 V 392 H 128 Z" fill="#161b22"/>
+</svg>

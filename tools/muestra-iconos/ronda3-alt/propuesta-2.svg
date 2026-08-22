@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Propuesta 2: "El Cuaderno de Lectura" (The Reading Journal with Spine & Bookmark) -->
+  <!-- Base de papel digital claro (#f6f8fa) -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#f6f8fa"/>
+  <!-- Lomo de encuadernación oscuro en el lateral izquierdo (#161b22) -->
+  <path d="M 0 0 H 128 V 512 H 0 Z" fill="#161b22"/>
+  <!-- Cinta marcapáginas en azul acento (#58a6ff) -->
+  <path d="M 232 0 H 368 V 400 L 300 336 L 232 400 Z" fill="#58a6ff"/>
+</svg>

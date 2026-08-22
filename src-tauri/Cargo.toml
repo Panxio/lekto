@@ -1,0 +1,45 @@
+[package]
+name = "lekto-core"
+version = "0.1.0"
+edition = "2021"
+build = "build.rs"
+
+[lib]
+name = "lekto_core"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "lekto"
+path = "src/main.rs"
+
+[dependencies]
+# Serde para serialización de los tipos de retorno hacia el frontend de Tauri.
+serde = { version = "1.0", features = ["derive"] }
+# tauri runtime v2 proporciona el framework necesario para la orquestación de la UI, ventanas e IPC.
+tauri = { version = "2.0.0", features = [] }
+# tokio proporciona el motor de tareas asíncronas para ejecutar operaciones de I/O fuera del hilo principal.
+tokio = { version = "1.30", features = ["rt"] }
+# pulldown-cmark es un parser de CommonMark rápido y liviano en Rust para convertir Markdown a HTML de manera segura.
+pulldown-cmark = { version = "0.12", default-features = false, features = ["html"] }
+# tauri-plugin-dialog provee la API nativa de Tauri para abrir y guardar diálogos de selección de archivos.
+tauri-plugin-dialog = "2.0.0"
+# notify es un watcher de archivos liviano y multiplataforma, estándar del ecosistema, que permite recargar documentos automáticamente al cambiar en disco.
+notify = "6"
+
+# tauri-plugin-single-instance: sin él, cada "Abrir con Lekto" lanza una ventana
+# nueva. Con él, el segundo lanzamiento entrega su argv a la instancia viva y el
+# archivo entra como una pestaña más, que es el modelo de la app.
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-single-instance = "2"
+
+
+[build-dependencies]
+# tauri-build procesa las configuraciones de Tauri (tauri.conf.json) y genera código auxiliar durante la compilación.
+tauri-build = { version = "2.0.0", features = [] }
+
+[dev-dependencies]
+# tempfile para crear archivos y directorios temporales en el arnés de verificación.
+tempfile = "3.8"
+# serde_json para el arnés que compara tauri.conf.json con tauri.macos.conf.json.
+# Es dev-dependency: NO entra al binario final, así que no suma peso al bundle.
+serde_json = "1.0"

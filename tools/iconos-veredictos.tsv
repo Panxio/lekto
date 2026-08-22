@@ -1,0 +1,27 @@
+# MUESTRA CONGELADA — veredictos HUMANOS de los iconos de Lekto.
+# Congelada el 2026-08-21 ANTES de tocar un solo umbral.
+#
+# REGLA: acá solo entran veredictos que una persona EMITIÓ y que están registrados en
+# la bitácora del proyecto. No se infiere un veredicto de "no fue elegido":
+# preferir A sobre B no convierte a B en inaceptable. Lo no emitido va como 'excluido'.
+#
+# columnas: ruta <TAB> veredicto <TAB> procedencia del veredicto
+# veredicto: aceptable | rechazado | excluido
+
+tools/muestra-iconos/opcion-1.svg	rechazado	ronda 1: ilegible a 32px (calibración original, cabecera de check-icon.sh)
+tools/muestra-iconos/opcion-2.svg	aceptable	ronda 1: legible a 32px (calibración original, cabecera de check-icon.sh)
+tools/muestra-iconos/opcion-3.svg	rechazado	ronda 1: ilegible a 32px (calibración original, cabecera de check-icon.sh)
+tools/muestra-iconos/ronda2/letra-1.svg	rechazado	ronda 2: el árbitro dio 5/5 verde y el ojo 0/5 aceptable
+tools/muestra-iconos/ronda2/letra-2.svg	rechazado	ronda 2: el árbitro dio 5/5 verde y el ojo 0/5 aceptable
+tools/muestra-iconos/ronda2/libre.svg	rechazado	ronda 2: el árbitro dio 5/5 verde y el ojo 0/5 aceptable
+tools/muestra-iconos/ronda2/pagina-1.svg	rechazado	ronda 2: el árbitro dio 5/5 verde y el ojo 0/5 aceptable
+tools/muestra-iconos/ronda2/pagina-2.svg	rechazado	ronda 2: el árbitro dio 5/5 verde y el ojo 0/5 aceptable
+tools/muestra-iconos/ronda3-alt/propuesta-1.svg	rechazado	ronda 3 alt: silueta mutilada, esquina sup. derecha cuadrada
+tools/muestra-iconos/ronda3-alt/propuesta-2.svg	rechazado	ronda 3 alt: silueta mutilada, lado izquierdo cuadrado
+tools/muestra-iconos/ronda3-alt/propuesta-3.svg	rechazado	ronda 3 alt: silueta mutilada, esquina sup. derecha cuadrada
+tools/muestra-iconos/ronda3/a-marcador.svg	aceptable	ELEGIDO; fue el icono publicado hasta el rediseño
+tools/muestra-iconos/ronda4/a-actual.svg	aceptable	elegido: mantener A; decisión cerrada
+tools/muestra-iconos/ronda3/b-corchetes.svg	excluido	sin veredicto humano registrado (decisión explícita)
+tools/muestra-iconos/ronda3/c-lectura.svg	excluido	sin veredicto humano registrado (decisión explícita)
+tools/muestra-iconos/ronda4/b-azul.svg	excluido	no elegido, pero "no elegido" no es "rechazado" 
+tools/muestra-iconos/ronda4/c-silueta.svg	excluido	no elegido, pero "no elegido" no es "rechazado" 

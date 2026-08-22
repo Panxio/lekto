@@ -1,0 +1,9 @@
+# deps
+node_modules/
+target/
+dist/
+# os
+.DS_Store
+
+# generados por Tauri en cada build (no se versionan)
+src-tauri/gen/schemas/

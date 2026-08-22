@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo Squircle (#161b22) -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#161b22"/>
+
+  <!-- Cinta Marcador de Lectura en L en azul acento (#58a6ff) -->
+  <path d="M 136 64 H 240 V 304 H 384 V 392 H 136 Z" fill="#58a6ff"/>
+
+  <!-- Remate/Cabezal blanco macizo (#ffffff) en el extremo superior -->
+  <path d="M 136 64 H 240 V 136 H 136 Z" fill="#ffffff"/>
+</svg>

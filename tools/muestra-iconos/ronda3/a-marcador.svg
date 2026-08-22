@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- A — "Hoja marcada": una página con la esquina doblada y un marcador de lectura
+       insertado. UN solo objeto: el marcador nace del borde de la página. -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#161b22"/>
+  <!-- página: silueta maciza con la esquina superior derecha recortada (el doblez) -->
+  <path d="M 116 96 H 312 L 396 180 V 416 H 116 Z" fill="#ffffff"/>
+  <!-- doblez: el triángulo que completa la esquina, en acento -->
+  <path d="M 312 96 L 396 180 H 312 Z" fill="#58a6ff"/>
+  <!-- marcador de cinta con muesca inferior -->
+  <path d="M 180 96 H 252 V 324 L 216 288 L 180 324 Z" fill="#58a6ff"/>
+</svg>

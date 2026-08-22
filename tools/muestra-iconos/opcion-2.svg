@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo Squircle (#161b22) -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#161b22"/>
+  
+  <!-- Marcador de lectura (Bookmark Ribbon) en forma de 'L' (Azul acento Lekto #58a6ff) -->
+  <path d="M 144 64 H 232 V 304 H 384 V 392 H 144 Z" fill="#58a6ff"/>
+  
+  <!-- Renglones de lectura / Markdown en blanco (#ffffff) sobre la cinta vertical -->
+  <rect x="168" y="112" width="40" height="24" rx="4" fill="#ffffff"/>
+  <rect x="168" y="160" width="40" height="24" rx="4" fill="#ffffff"/>
+  <rect x="168" y="208" width="24" height="24" rx="4" fill="#ffffff"/>
+</svg>

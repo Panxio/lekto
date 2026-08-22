@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo Squircle de Papel Blanco (#ffffff) -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#ffffff"/>
+
+  <!-- Sombra del pliegue de página (#161b22) -->
+  <path d="M 336 0 L 512 176 H 336 Z" fill="#161b22"/>
+
+  <!-- Solapa doblada de la página en azul acento (#58a6ff) -->
+  <path d="M 336 0 L 512 176 V 0 Z" fill="#58a6ff"/>
+
+  <!-- Cinta Marcador de Lectura en L con remate en muesca chevron (#58a6ff) -->
+  <path d="M 136 104 H 240 V 304 H 384 L 344 348 L 384 392 H 136 Z" fill="#58a6ff"/>
+</svg>

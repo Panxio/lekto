@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo Squircle (#161b22) -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#161b22"/>
+
+  <!-- Cinta Marcador de Lectura en L (#58a6ff) -->
+  <path d="M 136 64 H 240 V 312 H 384 V 400 H 136 Z" fill="#58a6ff"/>
+
+  <!-- Renglones de texto ultra-gruesos jerarquizados en blanco (#ffffff) -->
+  <rect x="160" y="120" width="56" height="48" rx="8" fill="#ffffff"/>
+  <rect x="160" y="216" width="40" height="48" rx="8" fill="#ffffff"/>
+</svg>

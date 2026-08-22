@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- C — "Página con encabezado": hoja con esquina doblada; dentro, una barra de
+       título en acento y dos líneas de texto. El guiño a Markdown es el heading. -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#161b22"/>
+  <path d="M 112 84 H 316 L 400 168 V 428 H 112 Z" fill="#ffffff"/>
+  <path d="M 316 84 L 400 168 H 316 Z" fill="#58a6ff"/>
+  <rect x="164" y="232" width="132" height="56" fill="#58a6ff"/>
+  <rect x="164" y="320" width="184" height="44" fill="#161b22"/>
+  <rect x="164" y="388" width="132" height="44" fill="#161b22"/>
+</svg>

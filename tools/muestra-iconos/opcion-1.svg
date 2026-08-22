@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo Squircle (22% radius ~ 112px) -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#161b22"/>
+  
+  <!-- Corchete de apertura de sintaxis Markdown '[' en blanco (48px de grosor para legibilidad a 32px) -->
+  <path d="M 128 120 H 232 V 168 H 176 V 344 H 232 V 392 H 128 Z" fill="#ffffff"/>
+  
+  <!-- Monograma 'L' central en azul acento Lekto (#58a6ff) -->
+  <path d="M 232 184 H 280 V 344 H 384 V 392 H 232 Z" fill="#58a6ff"/>
+  
+  <!-- Corchete de cierre superior ']' en azul acento Lekto (#58a6ff) -->
+  <path d="M 280 120 H 384 V 228 H 336 V 168 H 280 Z" fill="#58a6ff"/>
+</svg>

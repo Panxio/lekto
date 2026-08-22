@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- B — "Corchetes de Markdown abrazando una página": conserva el concepto que
+       gustó (los corchetes), pero al centro va la PÁGINA, no la letra L. -->
+  <rect width="512" height="512" rx="112" ry="112" fill="#161b22"/>
+  <path d="M 84 116 H 180 V 172 H 140 V 340 H 180 V 396 H 84 Z" fill="#ffffff"/>
+  <path d="M 428 116 H 332 V 172 H 372 V 340 H 332 V 396 H 428 Z" fill="#ffffff"/>
+  <!-- página maciza con la esquina doblada, en acento -->
+  <path d="M 204 148 H 268 L 316 196 V 364 H 204 Z" fill="#58a6ff"/>
+</svg>
