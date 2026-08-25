@@ -4,6 +4,8 @@
 
 A lightweight and minimalist desktop Markdown reader.
 
+![Lekto opening a Markdown file from the file manager via "Open With": the file opens rendered in a new window](docs/img/demo-abrir-con.gif)
+
 ## Architecture and Performance
 
 Unlike Electron-based readers, Lekto is built with Tauri v2 (Rust backend paired with a lightweight web frontend, with no Node.js runtime), delivering minimal resource consumption and a compact footprint:
@@ -25,6 +27,10 @@ Unlike Electron-based readers, Lekto is built with Tauri v2 (Rust backend paired
 - Automatic reload when file changes on disk
 - Drag and drop, and direct Markdown pasting
 - English and Spanish interface (detects system language)
+
+![Lekto split view with two Markdown documents side by side and the sidebar showing table of contents, pinned and recent files](docs/img/captura-split.png)
+
+![Lekto showing a rendered Markdown document in dark theme, with tabs and sidebar](docs/img/captura-lectura.png)
 
 ## Requirements
 

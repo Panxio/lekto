@@ -4,6 +4,8 @@
 
 Lector de Markdown de escritorio ligero y minimalista.
 
+![Lekto abriendo un archivo Markdown desde el explorador con «Abrir con»: el archivo se abre renderizado en una ventana nueva](docs/img/demo-abrir-con.gif)
+
 ## Rendimiento y arquitectura
 
 A diferencia de los lectores basados en Electron, Lekto está construido sobre Tauri v2 (backend en Rust y frontend web sin Node.js en tiempo de ejecución), lo que permite un consumo mínimo de recursos y un tamaño reducido:
@@ -25,6 +27,10 @@ A diferencia de los lectores basados en Electron, Lekto está construido sobre T
 - Recarga automática al cambiar el archivo en disco
 - Arrastrar y soltar, y pegado directo de Markdown
 - Interfaz en español e inglés (detecta el idioma del sistema)
+
+![Vista dividida de Lekto con dos documentos Markdown lado a lado y la barra lateral de índice, fijados y recientes](docs/img/captura-split.png)
+
+![Lekto mostrando un documento Markdown renderizado en tema oscuro, con pestañas y barra lateral](docs/img/captura-lectura.png)
 
 ## Requisitos
 
