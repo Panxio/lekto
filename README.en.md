@@ -28,9 +28,22 @@ Unlike Electron-based readers, Lekto is built with Tauri v2 (Rust backend paired
 - Drag and drop, and direct Markdown pasting
 - English and Spanish interface (detects system language)
 
-![Lekto split view with two Markdown documents side by side and the sidebar showing table of contents, pinned and recent files](docs/img/captura-split.png)
+## What it looks like
 
-![Lekto showing a rendered Markdown document in dark theme, with tabs and sidebar](docs/img/captura-lectura.png)
+**Reading a document.** Typography, tables and lists, with the table of contents and recent files alongside.
+
+![Lekto showing a rendered Markdown document in dark theme, with a table and numbered lists](docs/img/captura-documento.png)
+
+**Callouts and diagrams.** All five GitHub callout types, and `mermaid` blocks rendered as diagrams.
+
+![Lekto's five callout types in distinct colors, with a rendered Mermaid flowchart below](docs/img/captura-avisos-diagrama.png)
+
+**Split view.** Two documents side by side, each pane with its own tabs.
+
+![Lekto split view with two Markdown documents side by side](docs/img/captura-split.png)
+
+See it for yourself: the repository ships [`docs/demo.md`](docs/demo.md), a document that gathers
+everything above. Open it with Lekto.
 
 ## Requirements
 

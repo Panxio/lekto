@@ -28,9 +28,22 @@ A diferencia de los lectores basados en Electron, Lekto está construido sobre T
 - Arrastrar y soltar, y pegado directo de Markdown
 - Interfaz en español e inglés (detecta el idioma del sistema)
 
-![Vista dividida de Lekto con dos documentos Markdown lado a lado y la barra lateral de índice, fijados y recientes](docs/img/captura-split.png)
+## Así se ve
 
-![Lekto mostrando un documento Markdown renderizado en tema oscuro, con pestañas y barra lateral](docs/img/captura-lectura.png)
+**Leyendo un documento.** Tipografía, tablas y listas, con el índice y los recientes a un lado.
+
+![Lekto mostrando un documento Markdown renderizado en tema oscuro, con una tabla y listas numeradas](docs/img/captura-documento.png)
+
+**Avisos y diagramas.** Los cinco tipos de aviso de GitHub, y los bloques `mermaid` renderizados como diagramas.
+
+![Los cinco avisos de Lekto en colores distintos, y debajo un diagrama de flujo Mermaid renderizado](docs/img/captura-avisos-diagrama.png)
+
+**Vista dividida.** Dos documentos lado a lado, cada panel con sus propias pestañas.
+
+![Vista dividida de Lekto con dos documentos Markdown lado a lado](docs/img/captura-split.png)
+
+Puedes comprobarlo tú mismo: el repositorio incluye [`docs/demo.md`](docs/demo.md), un documento
+que reúne todo lo anterior. Ábrelo con Lekto.
 
 ## Requisitos
 
