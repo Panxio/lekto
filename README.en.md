@@ -34,9 +34,13 @@ Unlike Electron-based readers, Lekto is built with Tauri v2 (Rust backend paired
 
 ![Lekto showing a rendered Markdown document in dark theme, with a table and numbered lists](docs/img/captura-documento.png)
 
-**Callouts and diagrams.** All five GitHub callout types, and `mermaid` blocks rendered as diagrams.
+**Callouts.** All five GitHub callout types, each with its own color and icon.
 
-![Lekto's five callout types in distinct colors, with a rendered Mermaid flowchart below](docs/img/captura-avisos-diagrama.png)
+![Lekto's five callout types — Note, Tip, Important, Warning and Caution — each in a distinct color](docs/img/captura-avisos.png)
+
+**Diagrams and formulas.** `mermaid` blocks render as diagrams, and mathematical expressions use LaTeX syntax.
+
+![A rendered Mermaid flowchart, with mathematical formulas below showing a summation and an integral](docs/img/captura-diagrama-formulas.png)
 
 **Split view.** Two documents side by side, each pane with its own tabs.
 

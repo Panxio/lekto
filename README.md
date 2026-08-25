@@ -34,9 +34,13 @@ A diferencia de los lectores basados en Electron, Lekto está construido sobre T
 
 ![Lekto mostrando un documento Markdown renderizado en tema oscuro, con una tabla y listas numeradas](docs/img/captura-documento.png)
 
-**Avisos y diagramas.** Los cinco tipos de aviso de GitHub, y los bloques `mermaid` renderizados como diagramas.
+**Avisos.** Los cinco tipos de aviso de GitHub, cada uno con su color y su icono.
 
-![Los cinco avisos de Lekto en colores distintos, y debajo un diagrama de flujo Mermaid renderizado](docs/img/captura-avisos-diagrama.png)
+![Los cinco avisos de Lekto —Nota, Sugerencia, Importante, Advertencia y Precaución— cada uno en un color distinto](docs/img/captura-avisos.png)
+
+**Diagramas y fórmulas.** Los bloques `mermaid` se renderizan como diagramas, y las expresiones matemáticas en sintaxis de LaTeX.
+
+![Un diagrama de flujo Mermaid renderizado, y debajo fórmulas matemáticas con un sumatorio y una integral](docs/img/captura-diagrama-formulas.png)
 
 **Vista dividida.** Dos documentos lado a lado, cada panel con sus propias pestañas.
 
