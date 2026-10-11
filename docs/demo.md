@@ -59,7 +59,7 @@ pub fn leer_markdown(ruta: &Path) -> Result<String, ErrorLectura> {
 
 ```bash
 # Instalar en Debian o Ubuntu (usa apt, no dpkg: apt resuelve las bibliotecas)
-sudo apt install ./Lekto_0.1.1_amd64.deb
+sudo apt install ./Lekto_0.1.2_amd64.deb
 
 # Abrir un documento desde la terminal
 lekto documento.md
