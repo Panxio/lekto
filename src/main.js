@@ -2,7 +2,7 @@
 // (withGlobalTauri). La lógica/validación vive en Rust; esto solo invoca y pinta.
 
 const SIDEBAR_MIN = 180, SIDEBAR_MAX = 480;
-const CONTENT_MIN = 600, CONTENT_MAX = 1400, CONTENT_DEFAULT = 900;
+const CONTENT_MIN = 600, CONTENT_MAX = 2000, CONTENT_DEFAULT = 900;
 const ZOOM_MIN = 0.7, ZOOM_MAX = 2.0, ZOOM_STEP = 0.1, ZOOM_DEFAULT = 1.0;
 
 // 1. Aplicar tema e idioma lo antes posible para evitar parpadeo (FOUC)
