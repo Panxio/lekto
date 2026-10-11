@@ -68,16 +68,16 @@ On Ubuntu 24.04 and later the GTK package is named `libgtk-3-0t64`; it satisfies
 Download the package from the Releases section. **Use `apt`, not `dpkg`** — `apt` installs any missing libraries and `dpkg` does not:
 
 ```bash
-sudo apt install ./Lekto_0.1.1_amd64.deb
+sudo apt install ./Lekto_0.1.2_amd64.deb
 ```
 
 On Fedora or openSUSE, with the `.rpm`:
 
 ```bash
-sudo dnf install ./Lekto-0.1.1-1.x86_64.rpm
+sudo dnf install ./Lekto-0.1.2-1.x86_64.rpm
 ```
 
-There is also an `.AppImage` that requires no installation: make it executable with `chmod +x` and run it. It is considerably larger (84 MB) because it carries its own libraries. If your system has no FUSE, run it with `./Lekto_0.1.1_amd64.AppImage --appimage-extract-and-run`.
+There is also an `.AppImage` that requires no installation: make it executable with `chmod +x` and run it. It is considerably larger (84 MB) because it carries its own libraries. If your system has no FUSE, run it with `./Lekto_0.1.2_amd64.AppImage --appimage-extract-and-run`.
 
 ### Windows
 
