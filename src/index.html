@@ -614,7 +614,7 @@ html.fullscreen.topbar-peek .topbar { transform: translateY(0); }
         font-size: 0.9rem;
       }
       #content {
-        word-break: break-word;
+        overflow-wrap: break-word; /* no word-break: break-word: encoge el ancho mínimo de las celdas a 1 carácter y aplasta las columnas de las tablas */
         padding-top: 1rem;
         max-width: var(--content-width, 900px);
         margin: 0 auto;
@@ -622,7 +622,7 @@ html.fullscreen.topbar-peek .topbar { transform: translateY(0); }
       }
       /* El panel derecho aplica sus PROPIAS variables de lectura. */
       #content-right {
-        word-break: break-word;
+        overflow-wrap: break-word;
         max-width: var(--content-width, 900px);
         margin: 0 auto;
         zoom: var(--content-zoom, 1);
@@ -725,7 +725,10 @@ html.fullscreen.topbar-peek .topbar { transform: translateY(0); }
       }
       #content table {
         border-collapse: collapse;
-        width: 100%;
+        display: block; /* con scroll horizontal propio: una tabla ancha se desplaza, no se aplasta */
+        width: max-content;
+        max-width: 100%;
+        overflow-x: auto;
         margin: 1.5rem 0;
       }
       #content th, #content td {
