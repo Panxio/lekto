@@ -662,7 +662,7 @@ html.fullscreen.topbar-peek .topbar { transform: translateY(0); }
         overflow-y: hidden;
       }
       /* Markdown elements styling */
-      #content h1 {
+      :is(#content, #content-right) h1 {
         font-size: 1.8rem;
         border-bottom: 1px solid var(--border-color);
         padding-bottom: 0.3em;
@@ -670,7 +670,7 @@ html.fullscreen.topbar-peek .topbar { transform: translateY(0); }
         margin-bottom: 1rem;
         font-weight: 600;
       }
-      #content h2 {
+      :is(#content, #content-right) h2 {
         font-size: 1.4rem;
         border-bottom: 1px solid var(--border-color);
         padding-bottom: 0.3em;
@@ -678,20 +678,20 @@ html.fullscreen.topbar-peek .topbar { transform: translateY(0); }
         margin-bottom: 1rem;
         font-weight: 600;
       }
-      #content h3 {
+      :is(#content, #content-right) h3 {
         font-size: 1.2rem;
         margin-top: 1.5rem;
         margin-bottom: 1rem;
         font-weight: 600;
       }
-      #content code {
+      :is(#content, #content-right) code {
         font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
         font-size: 85%;
         background-color: var(--code-bg);
         padding: 0.2em 0.4em;
         border-radius: 6px;
       }
-      #content pre {
+      :is(#content, #content-right) pre {
         position: relative;
         background-color: var(--pre-bg);
         padding: 1rem;
@@ -705,25 +705,25 @@ html.fullscreen.topbar-peek .topbar { transform: translateY(0); }
       #content pre:hover .copy-btn { opacity:1; }
       .copy-btn:hover { background:var(--btn-toggle-hover-bg); }
       .copy-btn.copied { opacity:1; }
-      #content pre code {
+      :is(#content, #content-right) pre code {
         background-color: transparent;
         padding: 0;
         font-size: 0.9rem;
         border-radius: 0;
       }
-      #content ul {
+      :is(#content, #content-right) ul {
         padding-left: 2rem;
         margin: 1rem 0;
       }
-      #content a {
+      :is(#content, #content-right) a {
         color: var(--link-color);
         text-decoration: none;
         transition: text-decoration 0.2s;
       }
-      #content a:hover {
+      :is(#content, #content-right) a:hover {
         text-decoration: underline;
       }
-      #content table {
+      :is(#content, #content-right) table {
         border-collapse: collapse;
         display: block; /* con scroll horizontal propio: una tabla ancha se desplaza, no se aplasta */
         width: max-content;
@@ -731,12 +731,12 @@ html.fullscreen.topbar-peek .topbar { transform: translateY(0); }
         overflow-x: auto;
         margin: 1.5rem 0;
       }
-      #content th, #content td {
+      :is(#content, #content-right) :is(th, td) {
         border: 1px solid var(--border-color);
         padding: 0.6rem 1rem;
         text-align: left;
       }
-      #content th {
+      :is(#content, #content-right) th {
         background-color: var(--pre-bg);
         font-weight: 600;
       }
