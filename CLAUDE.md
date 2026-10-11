@@ -181,7 +181,7 @@ MIDEN en cada ciclo para detectar regresiones, pero no bloquean:
 
 | Métrica | Meta | Última medición | ¿Bloquea? |
 |---|---|---|---|
-| Binario release | `< 15 MB` (referencia, relajada) | **11.60 MiB** | no — se pasó a priorizar calidad sobre peso |
+| Binario release | `< 15 MB` (referencia, relajada) | **14.47 MiB** (15 170 808 B, 2026-10-11) | no — se pasó a priorizar calidad sobre peso |
 | Apertura de un `.md` de ~50 KB (ruta Rust: lectura + render) | `< 200 ms` | **0.56 ms** | **sí** |
 | RAM en reposo | sin umbral duro; solo "no Electron-level" | ~200 MB PSS (piso de webkit2gtk) | no |
 
