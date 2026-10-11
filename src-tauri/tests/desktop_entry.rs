@@ -11,7 +11,7 @@ use std::process::Command;
 
 fn deb_path() -> Option<PathBuf> {
     let p = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("target/release/bundle/deb/Lekto_0.1.0_amd64.deb");
+        .join("target/release/bundle/deb/Lekto_0.1.1_amd64.deb");
     p.exists().then_some(p)
 }
 

@@ -292,7 +292,7 @@ document.documentElement.setAttribute("lang", currentLang);
 // 2. Esperar a que el DOM esté listo para interactuar con los elementos
 document.addEventListener("DOMContentLoaded", () => {
   const { invoke } = window.__TAURI__.core;
-  const APP_VERSION = "0.1.0"; // refleja src-tauri/tauri.conf.json
+  const APP_VERSION = "0.1.1"; // refleja src-tauri/tauri.conf.json
 
   // ---- Ajustes de lectura ----
   // El valor vive en la PESTAÑA; :root guarda solo el DEFAULT global que heredan los docs nuevos.
