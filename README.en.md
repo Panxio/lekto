@@ -10,7 +10,7 @@ A lightweight and minimalist desktop Markdown reader.
 
 Unlike Electron-based readers, Lekto is built with Tauri v2 (Rust backend paired with a lightweight web frontend, with no Node.js runtime), delivering minimal resource consumption and a compact footprint:
 
-- **Release binary:** 15.9 MiB
+- **Release binary:** 16.0 MiB
 - **.deb package:** 5.5 MB
 - **Reading and rendering a ~50 KB `.md` in Rust:** under 1 ms
 
@@ -51,7 +51,7 @@ everything above. Open it with Lekto.
 
 ## Requirements
 
-Lekto uses the web engine already provided by the operating system instead of bundling its own. That is why the binary is 15.9 MiB, and also why that engine needs to be present on the system.
+Lekto uses the web engine already provided by the operating system instead of bundling its own. That is why the binary is 16.0 MiB, and also why that engine needs to be present on the system.
 
 | System | Requires | Included by default? |
 |---|---|---|
@@ -68,16 +68,16 @@ On Ubuntu 24.04 and later the GTK package is named `libgtk-3-0t64`; it satisfies
 Download the package from the Releases section. **Use `apt`, not `dpkg`** — `apt` installs any missing libraries and `dpkg` does not:
 
 ```bash
-sudo apt install ./Lekto_0.1.0_amd64.deb
+sudo apt install ./Lekto_0.1.1_amd64.deb
 ```
 
 On Fedora or openSUSE, with the `.rpm`:
 
 ```bash
-sudo dnf install ./Lekto-0.1.0-1.x86_64.rpm
+sudo dnf install ./Lekto-0.1.1-1.x86_64.rpm
 ```
 
-There is also an `.AppImage` that requires no installation: make it executable with `chmod +x` and run it. It is considerably larger (83 MB) because it carries its own libraries. If your system has no FUSE, run it with `./Lekto_0.1.0_amd64.AppImage --appimage-extract-and-run`.
+There is also an `.AppImage` that requires no installation: make it executable with `chmod +x` and run it. It is considerably larger (84 MB) because it carries its own libraries. If your system has no FUSE, run it with `./Lekto_0.1.1_amd64.AppImage --appimage-extract-and-run`.
 
 ### Windows
 

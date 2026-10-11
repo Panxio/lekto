@@ -10,7 +10,7 @@ Lector de Markdown de escritorio ligero y minimalista.
 
 A diferencia de los lectores basados en Electron, Lekto está construido sobre Tauri v2 (backend en Rust y frontend web sin Node.js en tiempo de ejecución), lo que permite un consumo mínimo de recursos y un tamaño reducido:
 
-- **Binario release:** 15.9 MiB
+- **Binario release:** 16.0 MiB
 - **Paquete .deb:** 5.5 MB
 - **Lectura y render de un `.md` de ~50 KB en Rust:** menos de 1 ms
 
@@ -51,7 +51,7 @@ que reúne todo lo anterior. Ábrelo con Lekto.
 
 ## Requisitos
 
-Lekto usa el motor web que ya trae el sistema operativo en vez de incluir uno propio. Por eso el binario pesa 15.9 MiB, y también por eso necesita que ese motor esté presente en el sistema.
+Lekto usa el motor web que ya trae el sistema operativo en vez de incluir uno propio. Por eso el binario pesa 16.0 MiB, y también por eso necesita que ese motor esté presente en el sistema.
 
 | Sistema | Necesita | ¿Viene por defecto? |
 |---|---|---|
@@ -68,16 +68,16 @@ En Ubuntu 24.04 y posteriores el paquete de GTK se llama `libgtk-3-0t64`; satisf
 Descarga el paquete desde la sección de Releases. **Usa `apt` y no `dpkg`**, porque `apt` instala las bibliotecas que falten y `dpkg` no:
 
 ```bash
-sudo apt install ./Lekto_0.1.0_amd64.deb
+sudo apt install ./Lekto_0.1.1_amd64.deb
 ```
 
 En Fedora u openSUSE, con el `.rpm`:
 
 ```bash
-sudo dnf install ./Lekto-0.1.0-1.x86_64.rpm
+sudo dnf install ./Lekto-0.1.1-1.x86_64.rpm
 ```
 
-También hay un `.AppImage` que no requiere instalar nada: dale permiso de ejecución con `chmod +x` y ábrelo. Pesa bastante más (83 MB) porque lleva sus propias bibliotecas dentro. Si tu sistema no tiene FUSE, ábrelo con `./Lekto_0.1.0_amd64.AppImage --appimage-extract-and-run`.
+También hay un `.AppImage` que no requiere instalar nada: dale permiso de ejecución con `chmod +x` y ábrelo. Pesa bastante más (84 MB) porque lleva sus propias bibliotecas dentro. Si tu sistema no tiene FUSE, ábrelo con `./Lekto_0.1.1_amd64.AppImage --appimage-extract-and-run`.
 
 ### Windows
 
